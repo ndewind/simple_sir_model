@@ -1,0 +1,2 @@
+This is an interactive Susceptible-Infected-Recovered (SIR) epidemiological model. You can manipulate the sliders below the plot to change the parameters of the model. For more information on the model see a short introduction I wrote here; 
+https://nickdewind.com/2020_04_29_Understanding_SIR.html

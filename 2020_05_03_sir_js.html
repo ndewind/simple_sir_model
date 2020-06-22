@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style type="text/css">
+
+	.bodyText { 
+	font-family: Arial, Helvetica, sans-serif;
+	margin-left: auto;
+	margin-right: auto;
+	max-width:35em;
+	text-align: justify;
+	text-justify: inter-word; }
+	
+	.titleText { 
+	font-family: Arial, Helvetica, sans-serif;
+	margin-left: auto;
+	margin-right: auto;
+	max-width:35em }
+	
+	.slidecontainer {
+	  <!--width: 100%;-->
+	  font-family: Arial, Helvetica, sans-serif;
+	  margin-left: auto;
+	  margin-right: auto;
+	  max-width:35em;
+	  text-align: left;
+	  text-justify: inter-word;
+	}
+
+	.slider {
+	  -webkit-appearance: none;
+	  <!--width: 100%;-->
+	  font-family: Arial, Helvetica, sans-serif;
+	  margin-left: auto;
+	  margin-right: auto;
+	  max-width:15em;
+	  text-align: left;
+	  text-justify: inter-word;
+	  max-width:35em;
+	  height: 1em;
+	  background: #d3d3d3;
+	  outline: none;
+	  opacity: 0.7;
+	  -webkit-transition: .2s;
+	  transition: opacity .2s;
+	}
+
+	.slider:hover {
+	  opacity: 1;
+	}
+
+	.slider::-webkit-slider-thumb {
+	  -webkit-appearance: none;
+	  appearance: none;
+	  width: .5em;
+	  height: 1.5em;
+	  background: #4CAF50;
+	  cursor: pointer;
+	}
+
+	.slider::-moz-range-thumb {
+	  width: .5em;
+	  height: 1.5em;
+	  background: #4CAF50;
+	  cursor: pointer;
+	}
+	
+</style>
+
+<head>
+	<!-- Load plotly.js into the DOM -->
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+	<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>-->
+	<script src="scripts/2020_05_03/sir_js.js"></script>
+</head>
+
+<body>
+	
+	<div class="titleText">
+	
+		<h1> Interactive Susceptible-Infected-Recovered Model </h1>
+	
+		<p>by <a href="https://nickdewind.com/">Nick DeWind</a> May 3, 2020 </p>
+		
+	</div>
+	
+	<div class="bodyText">
+	<p> This is an interactive Susceptible-Infected-Recovered (SIR) epidemiological
+    model. You can manipulate the sliders below the plot to change the parameters 
+	of the model. For more information on the model see a short introduction I wrote
+    <a href="https://nickdewind.com/2020_04_29_Understanding_SIR.html">here</a>. </p>
+	</div>
+	
+	<div class="bodyText" id='myDiv'><!-- Plotly chart will be drawn inside this DIV --></div>
+	
+	<div class="slidecontainer">
+	
+	  <p>R<sub>0</sub>&#58; <span id="r0Report"></span></p>
+	
+	  <p>Recovery Time&#58; <span id="recovDayReport"></span> Days</p>
+	  <input type="range" min="1" max="60" value="30" class="slider" id="recovDaySlide">
+	  
+	  <p>Transmission Rate&#58; <span id="transReport"></span> Contacts per Day</p>
+	  <input type="range" min="0" max="50" value="10" class="slider" id="transSlide">
+	  
+	  <p>Infection Fatality Ratio&#58; <span id="ifrReport"></span>&#37;</p>
+	  <input type="range" min="0" max="100" value="20" class="slider" id="ifrSlide">
+	  
+	</div>
+
+	<script>
+	var recovDaySlide = document.getElementById("recovDaySlide");
+	var recovDayReport = document.getElementById("recovDayReport");
+	recovDayReport.innerHTML = recovDaySlide.value;
+	let recovDay = recovDaySlide.value;
+	recovDaySlide.oninput = function() {
+	  recovDayReport.innerHTML = this.value;
+	  recovDay = this.value;
+	  r0Report.innerHTML = (recovDay*transRate).toFixed(2);
+	  let sirdt = calculate_SIRD(i0, ifr, transRate, recovDay, ndays, inter)
+	  plotSIRD(sirdt)
+	}
+	
+	var transSlide = document.getElementById("transSlide");
+	var transReport = document.getElementById("transReport");
+	transReport.innerHTML = transSlide.value/100;
+	let transRate = transSlide.value/100;
+	transSlide.oninput = function() {
+	  transReport.innerHTML = this.value/100;//update the html report
+	  transRate = this.value/100;//update the internal variable
+	  r0Report.innerHTML = (recovDay*transRate).toFixed(2);
+	  let sirdt = calculate_SIRD(i0, ifr, transRate, recovDay, ndays, inter)
+	  plotSIRD(sirdt)
+	}
+	
+	var ifrSlide = document.getElementById("ifrSlide");
+	var ifrReport = document.getElementById("ifrReport");
+	ifrReport.innerHTML = ifrSlide.value;
+	let ifr = ifrSlide.value/100;
+	ifrSlide.oninput = function() {
+	  ifrReport.innerHTML = this.value;//update the html report
+	  ifr = this.value/100;//update the internal variable
+	  let sirdt = calculate_SIRD(i0, ifr, transRate, recovDay, ndays, inter)
+	  plotSIRD(sirdt)
+	}
+	
+	// set the R0 (first time. will update with changes to recov or trans)
+	r0Report.innerHTML = (recovDay*transRate).toFixed(2);
+	
+	
+	</script>
+
+	
+</body>
+
+<script>
+	let i0 = 0.001;
+	//let ifr = 0.2;
+	//let transRate = 0.1;
+	//let recovDay = 20;
+	let ndays = 365;
+	let inter = 10;
+	let sirdt = calculate_SIRD(i0, ifr, transRate, recovDay, ndays, inter)
+	plotSIRD(sirdt)
+</script>
